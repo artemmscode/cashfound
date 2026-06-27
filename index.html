@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0c0c0f">
+<meta name="description" content="CASH FOUND — система заработка на банковском трафике и финансовых офферах. Автор: WauzeX (Артём).">
+<title>CASH FOUND — Система заработка на банковском трафике</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0c0f;
+    --bg-2:#101014;
+    --surface:rgba(255,255,255,0.035);
+    --surface-2:rgba(255,255,255,0.06);
+    --border:rgba(255,255,255,0.08);
+    --border-strong:rgba(255,255,255,0.15);
+    --text:#f1f1f4;
+    --text-dim:#9a9aa4;
+    --text-faint:#66666e;
+    --accent:#ffffff;
+    --radius:20px;
+    --ease:cubic-bezier(.22,.61,.36,1);
+    --maxw:1140px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{
+    font-family:'Manrope',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.6;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  h1,h2,h3,h4{font-family:'Space Grotesk','Manrope',sans-serif;letter-spacing:-.02em;line-height:1.08;font-weight:600}
+  a{color:inherit;text-decoration:none}
+  img,svg{display:block;max-width:100%}
+  ::selection{background:rgba(255,255,255,0.85);color:#000}
+
+  ::-webkit-scrollbar{width:9px}
+  ::-webkit-scrollbar-track{background:#0a0a0d}
+  ::-webkit-scrollbar-thumb{background:#232329;border-radius:9px;border:2px solid #0a0a0d}
+  ::-webkit-scrollbar-thumb:hover{background:#34343d}
+
+  /* ===== AMBIENT BACKGROUND (very subtle) ===== */
+  .bg-fixed{position:fixed;inset:0;z-index:-3;pointer-events:none;overflow:hidden}
+  .glow{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none}
+  .glow-1{width:560px;height:560px;left:-180px;top:-160px;background:radial-gradient(circle,rgba(255,255,255,0.10),transparent 70%);animation:drift1 26s var(--ease) infinite}
+  .glow-2{width:480px;height:480px;right:-160px;top:30%;background:radial-gradient(circle,rgba(255,255,255,0.07),transparent 70%);animation:drift2 30s var(--ease) infinite}
+  .glow-3{width:520px;height:520px;left:35%;bottom:-260px;background:radial-gradient(circle,rgba(255,255,255,0.06),transparent 70%);animation:drift3 34s var(--ease) infinite}
+  @keyframes drift1{0%,100%{transform:translate(0,0)}50%{transform:translate(60px,40px)}}
+  @keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-70px,30px)}}
+  @keyframes drift3{0%,100%{transform:translate(0,0)}50%{transform:translate(50px,-50px)}}
+
+  #particles{position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:.7}
+  .grid-overlay{position:fixed;inset:0;z-index:-2;pointer-events:none;
+    background-image:linear-gradient(rgba(255,255,255,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.018) 1px,transparent 1px);
+    background-size:72px 72px;
+    mask-image:radial-gradient(ellipse at 50% 0%,#000 5%,transparent 70%);
+    -webkit-mask-image:radial-gradient(ellipse at 50% 0%,#000 5%,transparent 70%);
+  }
+
+  /* ===== LAYOUT ===== */
+  .wrap{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 24px;padding:0 max(24px,env(safe-area-inset-left)) 0 max(24px,env(safe-area-inset-right))}
+  section{position:relative;padding:104px 0;z-index:1}
+  @media(max-width:720px){section{padding:68px 0}}
+  @media(max-width:560px){.wrap{padding:0 18px;padding:0 max(18px,env(safe-area-inset-left)) 0 max(18px,env(safe-area-inset-right))}}
+
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:9px;
+    font-size:12px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--text-dim);
+    padding:8px 16px;border-radius:100px;
+    background:var(--surface);border:1px solid var(--border);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:#fff;box-shadow:0 0 10px rgba(255,255,255,.8)}
+  .sec-head{max-width:720px;margin:0 auto 56px;text-align:center}
+  .sec-head h2{font-size:clamp(30px,5vw,48px);margin:20px 0 16px}
+  .sec-head p{color:var(--text-dim);font-size:clamp(15px,2vw,17.5px)}
+  .gradient-text{background:linear-gradient(180deg,#ffffff 25%,#8b909c 120%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+
+  /* ===== BUTTONS ===== */
+  .btn{
+    position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    font-family:inherit;font-weight:600;font-size:15px;letter-spacing:.01em;
+    padding:15px 30px;border-radius:100px;cursor:pointer;border:none;
+    transition:transform .35s var(--ease),box-shadow .35s var(--ease),background .35s var(--ease),border-color .35s var(--ease);
+    will-change:transform;overflow:hidden;white-space:nowrap;
+  }
+  .btn-primary{color:#0a0a0d;background:linear-gradient(180deg,#ffffff,#d9dde4);box-shadow:0 0 0 1px rgba(255,255,255,.4),0 10px 40px rgba(255,255,255,.22)}
+  .btn-primary:hover{transform:translateY(-3px);box-shadow:0 0 0 1px rgba(255,255,255,.6),0 18px 55px rgba(255,255,255,.4)}
+  .btn-primary::after{content:"";position:absolute;top:0;left:-120%;width:55%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.75),transparent);transform:skewX(-20deg);transition:left .8s var(--ease)}
+  .btn-primary:hover::after{left:150%}
+  .btn-ghost{color:var(--text);background:var(--surface);border:1px solid var(--border);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .btn-ghost:hover{background:var(--surface-2);border-color:var(--border-strong);transform:translateY(-2px)}
+
+  /* ===== HEADER ===== */
+  header{position:fixed;top:0;left:0;right:0;z-index:100;transition:background .4s var(--ease),backdrop-filter .4s var(--ease),border-color .4s var(--ease);border-bottom:1px solid transparent}
+  header.scrolled{background:rgba(12,12,15,0.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .logo{display:flex;align-items:center;gap:11px;font-family:'Space Grotesk';font-weight:600;font-size:17px;letter-spacing:.02em}
+  .logo-mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#fff,#b9c0cc);display:grid;place-items:center;color:#0a0a0d;font-weight:700;box-shadow:0 0 22px rgba(255,255,255,.35)}
+  .nav-links{display:flex;align-items:center;gap:28px}
+  .nav-links a{font-size:14px;font-weight:500;color:var(--text-dim);transition:color .25s}
+  .nav-links a:hover{color:var(--text)}
+  .nav-cta{display:flex;align-items:center;gap:14px}
+  .nav-cta .btn{padding:10px 20px;font-size:13.5px}
+  .burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px}
+  .burger span{width:22px;height:2px;background:#fff;border-radius:2px;transition:.3s}
+  .mobile-menu{position:fixed;inset:0;z-index:99;background:rgba(10,10,12,0.97);backdrop-filter:blur(20px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
+  .mobile-menu.open{opacity:1;pointer-events:auto}
+  .mobile-menu a{font-size:21px;font-weight:600;color:var(--text-dim)}
+  .mobile-menu a:hover{color:#fff}
+  @media(max-width:900px){
+    .nav-links{display:none}
+    .burger{display:flex}
+    .nav-cta .btn-primary{display:none}
+  }
+
+  /* ===== HERO ===== */
+  .hero{min-height:100vh;min-height:100dvh;display:flex;align-items:center;padding:130px 0 70px;overflow:hidden;text-align:center}
+  .hero-inner{position:relative;z-index:3;max-width:860px;margin:0 auto}
+  .hero h1{
+    font-size:clamp(48px,13vw,132px);font-weight:700;line-height:.92;letter-spacing:-.04em;
+    background:linear-gradient(180deg,#ffffff 18%,#8a909c 130%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    text-shadow:0 0 80px rgba(255,255,255,0.22);
+    margin-bottom:6px;
+  }
+  .hero .h-sub{font-size:clamp(17px,3.2vw,24px);font-weight:600;color:#e8e8ec;margin-top:16px}
+  .hero .h-text{max-width:600px;margin:22px auto 0;color:var(--text-dim);font-size:clamp(14.5px,2.2vw,17px)}
+  .hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:38px}
+  .hero-trust{display:flex;gap:18px 26px;justify-content:center;flex-wrap:wrap;margin-top:42px;color:var(--text-faint);font-size:13px}
+  .hero-trust .t{display:flex;align-items:center;gap:7px}
+  .hero-trust svg{width:15px;height:15px;color:#fff;opacity:.7}
+  @media(max-width:560px){
+    .hero{padding:108px 0 56px}
+    .hero-actions{flex-direction:column;width:100%}
+    .hero-actions .btn{width:100%}
+    .hero-trust{gap:14px 20px;font-size:12px}
+    .hero-trust svg{width:14px;height:14px}
+  }
+
+  /* hero subtle horizon */
+  .hero-decor{position:absolute;inset:0;z-index:1;pointer-events:none}
+  .horizon{position:absolute;left:0;right:0;bottom:0;height:42vh;height:42dvh;max-height:460px;opacity:.95;z-index:1}
+  .horizon::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,transparent 70%,var(--bg) 100%);pointer-events:none}
+  @media(max-width:560px){.horizon{height:30vh;height:30dvh;max-height:none;opacity:.8}}
+
+  /* ===== STATS ===== */
+  .stats{padding:0 0 20px}
+  .stats-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+    background:var(--border);border:1px solid var(--border);border-radius:22px;overflow:hidden;
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  }
+  .stat{background:rgba(12,12,15,0.6);text-align:center;padding:34px 12px;transition:background .4s var(--ease)}
+  .stat:hover{background:rgba(255,255,255,0.04)}
+  .stat .num{font-family:'Space Grotesk';font-weight:700;font-size:clamp(24px,3.6vw,38px);background:linear-gradient(180deg,#fff,#9aa0ad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .stat .lbl{margin-top:6px;font-size:clamp(11px,1.6vw,12.5px);color:var(--text-dim)}
+  @media(max-width:780px){.stats-grid{grid-template-columns:repeat(3,1fr)}.stat{padding:22px 8px}}
+  @media(max-width:420px){.stats-grid{grid-template-columns:repeat(3,1fr);gap:0}.stat{padding:18px 4px}.stat .lbl{font-size:10.5px}}
+
+  /* ===== CARD ===== */
+  .card{
+    position:relative;background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);padding:30px;height:100%;
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    transition:transform .45s var(--ease),border-color .45s var(--ease),background .45s var(--ease),box-shadow .45s var(--ease);
+    overflow:hidden;
+  }
+  .card:hover{transform:translateY(-5px);border-color:var(--border-strong);background:var(--surface-2);box-shadow:0 22px 55px rgba(0,0,0,.45),0 0 36px rgba(255,255,255,.05)}
+  .card .ic-wrap{width:48px;height:48px;border-radius:13px;display:grid;place-items:center;margin-bottom:18px;background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.03));border:1px solid var(--border);color:#fff}
+  .card h3{font-size:18px;margin-bottom:9px;font-weight:600}
+  .card p{color:var(--text-dim);font-size:14.5px}
+  @media(max-width:560px){
+    .card{padding:24px 22px}
+    .card .ic-wrap{width:44px;height:44px;margin-bottom:14px}
+    .card h3{font-size:16.5px}
+    .card p{font-size:14px}
+  }
+
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:920px){.grid-3{grid-template-columns:repeat(2,1fr);gap:14px}}
+  @media(max-width:620px){.grid-3{grid-template-columns:1fr;gap:12px}}
+
+  /* INSIDE badges */
+  .inside .card .badge{position:absolute;top:18px;right:22px;font-family:'Space Grotesk';font-weight:600;font-size:12.5px;color:var(--text-faint)}
+  .inside .card .ic-wrap{margin-bottom:22px}
+
+  /* WHY */
+  .why-item{display:flex;gap:15px;align-items:flex-start;padding:26px}
+  .why-item .check{flex:none;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(255,255,255,.16),rgba(255,255,255,.04));border:1px solid var(--border-strong);color:#fff}
+  .why-item h4{font-size:16px;margin-bottom:5px;font-weight:600}
+  .why-item p{color:var(--text-dim);font-size:13.5px}
+
+  /* ===== AUTHOR (real photo) ===== */
+  .author{display:grid;grid-template-columns:0.8fr 1.2fr;gap:56px;align-items:center}
+  @media(max-width:880px){.author{grid-template-columns:1fr;gap:36px;max-width:560px;margin:0 auto}}
+  @media(max-width:560px){.author{gap:30px}}
+  .author-photo{
+    position:relative;aspect-ratio:4/5;border-radius:24px;overflow:hidden;
+    border:1px solid var(--border-strong);
+    background:#0a0a0d;
+    box-shadow:0 40px 90px rgba(0,0,0,.6),0 0 60px rgba(255,255,255,.06);
+    max-width:440px;width:100%;margin-left:auto;
+  }
+  @media(max-width:880px){.author-photo{margin:0 auto}}
+  .author-photo::before{content:"";position:absolute;inset:-2px;z-index:3;border-radius:24px;background:conic-gradient(from 200deg,transparent,rgba(255,255,255,.25),transparent 50%);opacity:.6;animation:spin 16s linear infinite;mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);-webkit-mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);-webkit-mask-composite:xor;mask-composite:exclude;padding:1px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .author-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;z-index:1}
+  .author-photo .scrim{position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,transparent 45%,rgba(8,8,11,.55) 78%,rgba(8,8,11,.9) 100%)}
+  .author-photo .name-tag{position:absolute;left:16px;bottom:16px;right:16px;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border-radius:14px;background:rgba(10,10,13,.55);border:1px solid var(--border);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .author-photo .name-tag .nm{font-family:'Space Grotesk';font-weight:600;font-size:15px}
+  .author-photo .name-tag .rl{font-size:11.5px;color:var(--text-dim)}
+  .author-photo .name-tag .verified{width:22px;height:22px;border-radius:50%;background:#fff;display:grid;place-items:center;color:#0a0a0d;flex:none}
+  .author-text h2{font-size:clamp(26px,4.5vw,42px);margin-bottom:22px}
+  .author-text p{color:var(--text-dim);margin-bottom:15px;font-size:15.5px}
+  .author-text p b{color:#e8e8ec;font-weight:600}
+  @media(max-width:560px){.author-text p{font-size:14.5px;margin-bottom:13px}}
+  .author-mini-stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+  .author-mini-stats .ms{flex:1;min-width:140px;padding:18px;border-radius:14px;background:var(--surface);border:1px solid var(--border)}
+  .author-mini-stats .ms .v{font-family:'Space Grotesk';font-weight:700;font-size:22px}
+  .author-mini-stats .ms .k{font-size:12.5px;color:var(--text-dim)}
+  .author-highlights{
+    margin-top:30px;display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  }
+  .author-highlights .ah{
+    position:relative;padding:22px;border-radius:16px;
+    background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+    border:1px solid var(--border-strong);overflow:hidden;
+  }
+  .author-highlights .ah::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent)}
+  .author-highlights .ah .ahv{font-family:'Space Grotesk';font-weight:700;font-size:clamp(30px,4vw,40px);background:linear-gradient(180deg,#fff,#9aa0ad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+  .author-highlights .ah .ahl{margin-top:8px;font-size:13.5px;color:var(--text-dim)}
+  @media(max-width:560px){.author-highlights{grid-template-columns:1fr}}
+
+  /* ===== REVIEWS ===== */
+  .slider{overflow:hidden;border-radius:22px}
+  .slider-track{display:flex;transition:transform .7s var(--ease)}
+  .review{flex:0 0 100%;padding:5px}
+  .review-inner{display:grid;grid-template-columns:300px 1fr;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  @media(max-width:760px){.review-inner{grid-template-columns:1fr}}
+  .review-media{position:relative;min-height:230px;background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.10),transparent 60%),linear-gradient(160deg,#141418,#0a0a0d);display:grid;place-items:center;border-right:1px solid var(--border)}
+  @media(max-width:760px){.review-media{min-height:190px;border-right:none;border-bottom:1px solid var(--border)}}
+  .review-media .play{width:68px;height:68px;border-radius:50%;background:rgba(255,255,255,.92);color:#0a0a0d;display:grid;place-items:center;cursor:pointer;border:none;transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
+  .review-media .play:hover{transform:scale(1.1);box-shadow:0 0 0 14px rgba(255,255,255,.12)}
+  .review-media .play svg{margin-left:4px}
+  .review-media .dur{position:absolute;bottom:14px;left:14px;font-size:11.5px;color:var(--text-dim);background:rgba(0,0,0,.45);padding:5px 10px;border-radius:8px;border:1px solid var(--border)}
+  .review-body{padding:34px;display:flex;flex-direction:column;justify-content:center}
+  .review-body .stars{display:flex;gap:4px;color:#fff;margin-bottom:14px}
+  .review-body .stars svg{width:15px;height:15px}
+  .review-body .rtext{font-size:15.5px;color:#e6e6ea;margin-bottom:22px}
+  .review-body .rwho{display:flex;align-items:center;gap:13px}
+  .review-body .rav{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-family:'Space Grotesk';font-weight:700;color:#0a0a0d;font-size:15px}
+  .review-body .rav-name{font-weight:600;font-size:14.5px}
+  .review-body .rav-meta{font-size:12px;color:var(--text-dim)}
+  .slider-nav{display:flex;align-items:center;justify-content:space-between;margin-top:28px;gap:20px}
+  .dots{display:flex;gap:8px}
+  .dots button{width:8px;height:8px;border-radius:50%;border:none;background:rgba(255,255,255,.18);cursor:pointer;transition:.3s;padding:0}
+  .dots button.active{width:26px;border-radius:5px;background:#fff}
+  .arrows{display:flex;gap:10px}
+  .arrows button{width:46px;height:46px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:#fff;cursor:pointer;display:grid;place-items:center;transition:.3s;backdrop-filter:blur(10px)}
+  .arrows button:hover{background:var(--surface-2);border-color:var(--border-strong);transform:translateY(-2px)}
+
+  /* ===== FAQ ===== */
+  .faq{max-width:780px;margin:0 auto}
+  .faq-item{border:1px solid var(--border);border-radius:15px;margin-bottom:11px;background:var(--surface);overflow:hidden;transition:border-color .35s,background .35s;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+  .faq-item.open{border-color:var(--border-strong);background:var(--surface-2)}
+  .faq-q{width:100%;text-align:left;background:none;border:none;color:var(--text);font-family:inherit;font-size:16px;font-weight:600;padding:23px 25px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:18px}
+  .faq-q .ico{flex:none;width:26px;height:26px;border-radius:8px;border:1px solid var(--border);display:grid;place-items:center;transition:transform .4s var(--ease),background .4s}
+  .faq-item.open .faq-q .ico{transform:rotate(45deg);background:#fff;color:#0a0a0d}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .5s var(--ease)}
+  .faq-a p{padding:0 25px 23px;color:var(--text-dim);font-size:14.5px}
+
+  /* ===== FINAL ===== */
+  .final-card{
+    position:relative;max-width:880px;margin:0 auto;text-align:center;
+    background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));
+    border:1px solid var(--border-strong);border-radius:30px;padding:60px 40px;overflow:hidden;
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    box-shadow:0 50px 120px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.1);
+  }
+  .final-card::before{content:"";position:absolute;top:-50%;left:50%;transform:translateX(-50%);width:140%;height:140%;background:radial-gradient(circle,rgba(255,255,255,.10),transparent 45%);pointer-events:none}
+  .final-card .glow-line{position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent)}
+  .final-card h2{font-size:clamp(32px,6vw,54px);position:relative}
+  .final-card .fsub{color:var(--text-dim);font-size:clamp(15px,2.2vw,17.5px);max-width:560px;margin:18px auto 0;position:relative}
+  .price-box{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;margin:34px 0 12px}
+  .price-old{color:var(--text-faint);font-size:17px;text-decoration:line-through;text-decoration-color:rgba(255,120,120,.65);text-decoration-thickness:2px}
+  .price-new{font-family:'Space Grotesk';font-weight:700;font-size:clamp(52px,11vw,90px);line-height:1;background:linear-gradient(180deg,#fff,#9aa0ad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:0 0 60px rgba(255,255,255,.2)}
+  .price-note{color:#cfd2d8;font-size:13.5px;font-weight:600}
+  .final .btn{position:relative;font-size:16px;padding:19px 42px;margin-top:14px}
+  .final-feats{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;margin-top:28px;color:var(--text-dim);font-size:13px;position:relative}
+  .final-feats .f{display:flex;align-items:center;gap:7px}
+  .final-feats svg{width:14px;height:14px;color:#fff;opacity:.8}
+
+  /* ===== FOOTER ===== */
+  footer{border-top:1px solid var(--border);padding:48px 0 40px;position:relative;z-index:2}
+  .foot{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+  .foot .disclaimer{color:var(--text-faint);font-size:12px;max-width:480px}
+  .foot .logo{font-size:15px}
+
+  /* ===== MODAL ===== */
+  .modal{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:22px;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
+  .modal.open{opacity:1;pointer-events:auto}
+  .modal-box{position:relative;width:100%;max-width:720px;aspect-ratio:16/9;border-radius:18px;overflow:hidden;background:linear-gradient(160deg,#141418,#08080a);border:1px solid var(--border-strong);transform:scale(.9);transition:transform .45s var(--ease);display:grid;place-items:center}
+  .modal.open .modal-box{transform:scale(1)}
+  .modal-box .mclose{position:absolute;top:14px;right:14px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid var(--border);color:#fff;cursor:pointer;display:grid;place-items:center;transition:.3s;z-index:2}
+  .modal-box .mclose:hover{background:rgba(255,255,255,.15)}
+  .modal-content{text-align:center;padding:30px;max-width:82%}
+  .modal-content .big-play{width:78px;height:78px;border-radius:50%;background:#fff;color:#0a0a0d;display:grid;place-items:center;margin:0 auto 20px}
+  .modal-content .big-play svg{margin-left:5px}
+  .modal-content h4{font-size:20px;margin-bottom:10px}
+  .modal-content .mlink{color:var(--text-dim);font-size:13px;word-break:break-all}
+
+  /* ===== REVEAL ===== */
+  .reveal{opacity:0;transform:translateY(34px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+  .reveal.in{opacity:1;transform:none}
+  .reveal.d1{transition-delay:.08s}.reveal.d2{transition-delay:.16s}.reveal.d3{transition-delay:.24s}.reveal.d4{transition-delay:.32s}.reveal.d5{transition-delay:.4s}.reveal.d6{transition-delay:.48s}
+
+  [data-parallax]{transition:transform .15s linear}
+</style>
+</head>
+<body>
+
+<!-- ===== AMBIENT BG ===== -->
+<div class="bg-fixed">
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+  <div class="glow glow-3"></div>
+</div>
+<div class="grid-overlay"></div>
+<canvas id="particles"></canvas>
+
+<!-- ===== HEADER ===== -->
+<header id="header">
+  <div class="wrap nav">
+    <a href="#hero" class="logo">
+      <span class="logo-mark">C</span>
+      <span>CASH FOUND</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#what">Что это</a>
+      <a href="#inside">Программа</a>
+      <a href="#why">Преимущества</a>
+      <a href="#author">Автор</a>
+      <a href="#reviews">Отзывы</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="#price" class="btn btn-primary">Получить доступ</a>
+      <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#what" class="mm">Что это</a>
+  <a href="#inside" class="mm">Программа</a>
+  <a href="#why" class="mm">Преимущества</a>
+  <a href="#author" class="mm">Автор</a>
+  <a href="#reviews" class="mm">Отзывы</a>
+  <a href="#faq" class="mm">FAQ</a>
+  <a href="#price" class="btn btn-primary mm" style="margin-top:10px">Получить доступ</a>
+</div>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="hero">
+  <div class="hero-decor">
+    <!-- multi-layer skyline silhouette with soft fade-out bottom -->
+    <svg class="horizon" viewBox="0 0 1440 460" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="hFade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#000" stop-opacity="1"/>
+          <stop offset="0.62" stop-color="#000" stop-opacity="1"/>
+          <stop offset="1" stop-color="#000" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="farG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#15151b"/>
+          <stop offset="1" stop-color="#0a0a0d"/>
+        </linearGradient>
+        <linearGradient id="midG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#0e0e13"/>
+          <stop offset="1" stop-color="#070709"/>
+        </linearGradient>
+        <linearGradient id="nearG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#08080a"/>
+          <stop offset="1" stop-color="#050506"/>
+        </linearGradient>
+        <mask id="fadeMask">
+          <rect x="0" y="0" width="1440" height="460" fill="url(#hFade)"/>
+        </mask>
+      </defs>
+
+      <g mask="url(#fadeMask)">
+        <!-- FAR layer (deepest, faintest) -->
+        <g fill="url(#farG)" stroke="rgba(255,255,255,0.05)" stroke-width="1" opacity="0.7">
+          <rect x="0" y="300" width="60" height="160"/><rect x="60" y="280" width="40" height="180"/>
+          <rect x="100" y="320" width="55" height="140"/><rect x="155" y="260" width="48" height="200"/>
+          <rect x="203" y="290" width="42" height="170"/><rect x="245" y="270" width="50" height="190"/>
+          <rect x="295" y="310" width="45" height="150"/><rect x="340" y="250" width="55" height="210"/>
+          <rect x="395" y="285" width="40" height="175"/><rect x="435" y="265" width="50" height="195"/>
+          <rect x="485" y="300" width="45" height="160"/><rect x="530" y="255" width="52" height="205"/>
+          <rect x="582" y="295" width="40" height="165"/><rect x="622" y="275" width="48" height="185"/>
+          <rect x="670" y="240" width="55" height="220"/><rect x="725" y="285" width="42" height="175"/>
+          <rect x="767" y="260" width="50" height="200"/><rect x="817" y="295" width="44" height="165"/>
+          <rect x="861" y="250" width="54" height="210"/><rect x="915" y="290" width="40" height="170"/>
+          <rect x="955" y="270" width="48" height="190"/><rect x="1003" y="305" width="44" height="155"/>
+          <rect x="1047" y="258" width="52" height="202"/><rect x="1099" y="292" width="42" height="168"/>
+          <rect x="1141" y="272" width="50" height="188"/><rect x="1191" y="300" width="44" height="160"/>
+          <rect x="1235" y="262" width="52" height="198"/><rect x="1287" y="295" width="42" height="165"/>
+          <rect x="1329" y="280" width="48" height="180"/><rect x="1377" y="305" width="44" height="155"/>
+          <rect x="1421" y="285" width="40" height="175"/>
+        </g>
+
+        <!-- MID layer -->
+        <g fill="url(#midG)" stroke="rgba(255,255,255,0.08)" stroke-width="1">
+          <rect x="-10" y="335" width="80" height="125"/><rect x="70" y="300" width="60" height="160"/>
+          <rect x="130" y="355" width="70" height="105"/><rect x="200" y="270" width="90" height="190"/>
+          <rect x="290" y="330" width="60" height="130"/><rect x="350" y="295" width="80" height="165"/>
+          <rect x="430" y="355" width="65" height="105"/><rect x="495" y="250" width="100" height="210"/>
+          <rect x="595" y="320" width="60" height="140"/><rect x="655" y="285" width="85" height="175"/>
+          <rect x="740" y="200" width="120" height="260"/><rect x="860" y="310" width="65" height="150"/>
+          <rect x="925" y="265" width="90" height="195"/><rect x="1015" y="345" width="60" height="115"/>
+          <rect x="1075" y="245" width="105" height="215"/><rect x="1180" y="315" width="65" height="145"/>
+          <rect x="1245" y="290" width="85" height="170"/><rect x="1330" y="350" width="60" height="110"/>
+          <rect x="1390" y="305" width="70" height="155"/>
+        </g>
+
+        <!-- NEAR layer (closest, darkest, tallest) -->
+        <g fill="url(#nearG)" stroke="rgba(255,255,255,0.12)" stroke-width="1.2">
+          <rect x="20" y="360" width="95" height="100"/><rect x="115" y="330" width="75" height="130"/>
+          <rect x="190" y="375" width="85" height="85"/><rect x="275" y="250" width="110" height="210"/>
+          <rect x="385" y="360" width="80" height="100"/><rect x="465" y="315" width="95" height="145"/>
+          <rect x="560" y="380" width="75" height="80"/><rect x="635" y="225" width="125" height="235"/>
+          <rect x="760" y="370" width="80" height="90"/><rect x="840" y="300" width="100" height="160"/>
+          <rect x="940" y="385" width="75" height="75"/><rect x="1015" y="265" width="115" height="195"/>
+          <rect x="1130" y="375" width="80" height="85"/><rect x="1210" y="320" width="95" height="140"/>
+          <rect x="1305" y="385" width="75" height="75"/><rect x="1380" y="345" width="85" height="115"/>
+        </g>
+
+        <!-- antennas / spires on the tallest -->
+        <g stroke="rgba(255,255,255,0.18)" stroke-width="1.5" fill="none">
+          <line x1="330" y1="250" x2="330" y2="220"/>
+          <line x1="697" y1="225" x2="697" y2="185"/>
+          <line x1="1072" y1="265" x2="1072" y2="232"/>
+        </g>
+        <g fill="rgba(255,255,255,0.5)">
+          <circle cx="330" cy="220" r="2"/>
+          <circle cx="697" cy="185" r="2.2"/>
+          <circle cx="1072" cy="232" r="2"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <div class="wrap hero-inner">
+    <span class="eyebrow reveal"><span class="dot"></span>Финансовый трафик · Сезон 2026</span>
+    <h1 class="reveal d1">CASH FOUND</h1>
+    <div class="h-sub reveal d2">Полная система заработка на банковском трафике и финансовых офферах.</div>
+    <p class="h-text reveal d3">Получи доступ к пошаговой системе, которая поможет освоить одно из самых прибыльных направлений в арбитраже и финансовом маркетинге.</p>
+    <div class="hero-actions reveal d4">
+      <a href="#price" class="btn btn-primary">🔥 Получить доступ</a>
+      <a href="#what" class="btn btn-ghost">Узнать больше</a>
+    </div>
+
+    <div class="hero-trust reveal d5">
+      <span class="t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Доступ навсегда</span>
+      <span class="t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Поддержка 24/7</span>
+      <span class="t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Обновления курса</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== STATS ===== -->
+<section class="stats" style="padding-top:0">
+  <div class="wrap">
+    <div class="stats-grid reveal">
+      <div class="stat"><div class="num"><span class="count" data-to="40">0</span>+</div><div class="lbl">гайдов в курсе</div></div>
+      <div class="stat"><div class="num"><span class="count" data-to="20">0</span>+</div><div class="lbl">рабочих связок</div></div>
+      <div class="stat"><div class="num">24/7</div><div class="lbl">поддержка</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== WHAT IS ===== -->
+<section id="what">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow"><span class="dot"></span>О курсе</span>
+      <h2 class="gradient-text">Что такое CASH FOUND?</h2>
+      <p>CASH FOUND — это практический курс, в котором собраны рабочие схемы заработка на финансовых офферах и банковском трафике.</p>
+    </div>
+    <p class="reveal" style="max-width:720px;margin:-28px auto 36px;text-align:center;color:var(--text-dim);font-size:15px">Внутри курса ученики получают: пошаговые инструкции, актуальные связки, разборы запусков, настройку рекламы, работу с банками, методы масштабирования и поддержку сообщества.</p>
+    <div class="grid-3">
+      <div class="card reveal d1">
+        <div class="ic-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg></div>
+        <h3>Пошаговые инструкции</h3>
+        <p>От первых настроек до стабильного результата — каждый шаг разложен по полочкам.</p>
+      </div>
+      <div class="card reveal d2">
+        <div class="ic-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg></div>
+        <h3>Актуальные связки</h3>
+        <p>Готовые рабочие схемы, которые применяются прямо сейчас в реальных запусках.</p>
+      </div>
+      <div class="card reveal d3">
+        <div class="ic-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <h3>Поддержка сообщества</h3>
+        <p>Закрытый круг единомышленников, где можно задать вопрос и получить помощь.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== INSIDE ===== -->
+<section id="inside" class="inside">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow"><span class="dot"></span>Программа</span>
+      <h2 class="gradient-text">Что внутри курса</h2>
+      <p>Структурированная система: от базы до масштабирования дохода на финансовых офферах.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card reveal d1">
+        <span class="badge">01</span>
+        <div class="ic-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div>
+        <h3>40+ практических гайдов</h3>
+        <p>Пошаговые инструкции от запуска до получения первых результатов.</p>
+      </div>
+      <div class="card reveal d2">
+        <span class="badge">02</span>
+        <div class="ic-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg></div>
+        <h3>20+ рабочих связок</h3>
+        <p>Готовые схемы запуска, проверенные на практике и приносящие результат.</p>
+      </div>
+      <div class="card reveal d3">
+        <span class="badge">03</span>
+        <div class="ic-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg></div>
+        <h3>Актуальные офферы</h3>
+        <p>Финансовые предложения, с которыми команда работает прямо сейчас.</p>
+      </div>
+      <div class="card reveal d4">
+        <span class="badge">04</span>
+        <div class="ic-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <h3>Поддержка</h3>
+        <p>Ответы на вопросы и персональная помощь по каждому запуску.</p>
+      </div>
+      <div class="card reveal d5">
+        <span class="badge">05</span>
+        <div class="ic-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M21 7v6h-6"/></svg></div>
+        <h3>Масштабирование</h3>
+        <p>Как увеличивать объёмы, выходить на больший доход и не терять маржу.</p>
+      </div>
+      <div class="card reveal d6">
+        <span class="badge">06</span>
+        <div class="ic-wrap"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-6.2-8.5"/><path d="M21 4v5h-5"/></svg></div>
+        <h3>Обновления</h3>
+        <p>Доступ к новым материалам и связкам по мере их появления и тестирования.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== WHY ===== -->
+<section id="why">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow"><span class="dot"></span>Перспектива</span>
+      <h2 class="gradient-text">Почему именно эта ниша</h2>
+      <p>Финансовый трафик — одно из самых стабильных и хорошо оплачиваемых направлений на рынке.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card why-item reveal d1">
+        <div class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <div><h4>Высокие выплаты</h4><p>Финансовые офферы одни из самых щедрых на рынке по размеру вознаграждения.</p></div>
+      </div>
+      <div class="card why-item reveal d2">
+        <div class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <div><h4>Большое количество офферов</h4><p>Десятки банков и финансовых продуктов — всегда есть с чем работать.</p></div>
+      </div>
+      <div class="card why-item reveal d3">
+        <div class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <div><h4>Постоянный спрос</h4><p>Финансовые услуги нужны людям всегда — ниша не зависит от трендов.</p></div>
+      </div>
+      <div class="card why-item reveal d4">
+        <div class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <div><h4>Работа удалённо</h4><p>Нужен только ноутбук и интернет — зарабатывать можно из любой точки мира.</p></div>
+      </div>
+      <div class="card why-item reveal d5">
+        <div class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <div><h4>Подходит всем</h4><p>Старт возможен как для новичков с нуля, так и для опытных арбитражников.</p></div>
+      </div>
+      <div class="card why-item reveal d6">
+        <div class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+        <div><h4>Без команды</h4><p>Можно начать соло и масштабировать самостоятельно, без найма сотрудников.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== AUTHOR (real photo) ===== -->
+<section id="author">
+  <div class="wrap">
+    <div class="author">
+      <div class="author-photo reveal">
+        <img src="assets/author.png" alt="Артём — автор курса CASH FOUND (WauzeX)">
+        <div class="scrim"></div>
+        <div class="name-tag">
+          <div>
+            <div class="nm">Артём · WauzeX</div>
+            <div class="rl">Автор курса CASH FOUND</div>
+          </div>
+          <div class="verified" title="Верифицирован">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="author-text reveal d2">
+        <span class="eyebrow"><span class="dot"></span>Автор</span>
+        <h2 class="gradient-text" style="margin-top:18px">Кто такой WauzeX?</h2>
+        <p>Меня зовут <b>Артём</b>.</p>
+        <p>Уже более года я работаю в нише банковского трафика и финансовых офферов.</p>
+        <p>За это время мне удалось выстроить <b>стабильную систему заработка</b> и выйти на доход более <b>1800 долларов ежемесячно</b>.</p>
+        <p>В курсе CASH FOUND я собрал знания, которые сам использую каждый день.</p>
+        <p>Моя цель — <b>сократить ваш путь</b> и помочь избежать ошибок, через которые проходил я сам.</p>
+        <div class="author-highlights">
+          <div class="ah">
+            <div class="ahv">1800$+</div>
+            <div class="ahl">мой личный ежемесячный доход в нише</div>
+          </div>
+          <div class="ah">
+            <div class="ahv">1+ год</div>
+            <div class="ahl">работаю с банковским трафиком каждый день</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== REVIEWS ===== -->
+<section id="reviews">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow"><span class="dot"></span>Отзывы</span>
+      <h2 class="gradient-text">Истории учеников</h2>
+      <p>Реальные результаты людей, которые внедрили систему CASH FOUND.</p>
+    </div>
+    <div class="reveal">
+      <div class="slider">
+        <div class="slider-track" id="track"></div>
+      </div>
+      <div class="slider-nav">
+        <div class="dots" id="dots"></div>
+        <div class="arrows">
+          <button id="prev" aria-label="Назад"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <button id="next" aria-label="Вперёд"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow"><span class="dot"></span>Вопросы</span>
+      <h2 class="gradient-text">Частые вопросы</h2>
+      <p>Всё, что важно знать перед стартом в CASH FOUND.</p>
+    </div>
+    <div class="faq reveal">
+      <div class="faq-item">
+        <button class="faq-q">Как быстро я выйду на доход в CASH FOUND?<span class="ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></span></button>
+        <div class="faq-a"><p>Всё зависит от вовлечённости и действий. Многие ученики получают первые результаты уже в первые недели после запуска.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">На каком деле я буду делать деньги?<span class="ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></span></button>
+        <div class="faq-a"><p>Основной фокус курса — работа с банковским трафиком и финансовыми офферами.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Подойдёт ли мне CASH FOUND, если я начинаю с нуля?<span class="ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></span></button>
+        <div class="faq-a"><p>Да. Материал выстроен от базовых принципов до практических запусков.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Сколько времени нужно уделять?<span class="ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></span></button>
+        <div class="faq-a"><p>Достаточно нескольких часов в день для изучения и внедрения материалов.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Нужен ли опыт?<span class="ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></span></button>
+        <div class="faq-a"><p>Нет. Всё объясняется пошагово — от самых основ до рабочих запусков.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FINAL / PRICE ===== -->
+<section class="final" id="price">
+  <div class="wrap">
+    <div class="final-card reveal">
+      <div class="glow-line"></div>
+      <span class="eyebrow" style="position:relative"><span class="dot"></span>Старт сегодня</span>
+      <h2 class="gradient-text" style="margin-top:18px">Готов начать путь в CASH FOUND?</h2>
+      <p class="fsub">Получи доступ к системе уже сегодня и начни изучать одно из самых перспективных направлений заработка.</p>
+      <div class="price-box">
+        <div class="price-old">19 990 ₽</div>
+        <div class="price-new">9 990 ₽</div>
+        <div class="price-note">полный доступ навсегда · скидка 50%</div>
+      </div>
+      <a href="https://t.me/m/Qh_Rg27KZTEy" target="_blank" rel="noopener noreferrer" class="btn btn-primary">ПОЛУЧИТЬ ДОСТУП</a>
+      <div class="final-feats">
+        <span class="f"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Доступ навсегда</span>
+        <span class="f"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Все обновления</span>
+        <span class="f"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Поддержка 24/7</span>
+        <span class="f"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Закрытое комьюнити</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="wrap foot">
+    <a href="#hero" class="logo"><span class="logo-mark">C</span><span>CASH FOUND</span></a>
+    <p class="disclaimer">© 2026 CASH FOUND. Все права защищены. Материалы курса носят образовательный характер. Результаты зависят от ваших действий и могут отличаться.</p>
+    <a href="https://t.me/m/Qh_Rg27KZTEy" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="padding:11px 20px;font-size:13.5px">Связаться в Telegram</a>
+  </div>
+</footer>
+
+<!-- ===== MODAL ===== -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <button class="mclose" id="mclose"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    <div class="modal-content">
+      <div class="big-play"><svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+      <h4 id="mtitle">Видео-отзыв</h4>
+      <div class="mlink" id="mlink"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---------- particles (subtle, monochrome) ---------- */
+  var canvas=document.getElementById('particles');
+  var ctx=canvas.getContext('2d');
+  var W,H,parts=[];
+  var DPR=Math.min(window.devicePixelRatio||1,2);
+  function resize(){
+    W=canvas.width=window.innerWidth*DPR;
+    H=canvas.height=window.innerHeight*DPR;
+    canvas.style.width=window.innerWidth+'px';
+    canvas.style.height=window.innerHeight+'px';
+    var count=Math.min(60,Math.floor(window.innerWidth/22));
+    parts=[];
+    for(var i=0;i<count;i++){
+      parts.push({
+        x:Math.random()*W,y:Math.random()*H,
+        vx:(Math.random()-.5)*0.18*DPR,vy:(Math.random()-.5)*0.18*DPR,
+        r:(Math.random()*1.3+0.4)*DPR
+      });
+    }
+  }
+  function tick(){
+    ctx.clearRect(0,0,W,H);
+    for(var i=0;i<parts.length;i++){
+      var p=parts[i];
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,0.55)';
+      ctx.fill();
+      for(var j=i+1;j<parts.length;j++){
+        var q=parts[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.sqrt(dx*dx+dy*dy);
+        if(d<120*DPR){
+          ctx.beginPath();
+          ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);
+          ctx.strokeStyle='rgba(255,255,255,'+(0.06*(1-d/(120*DPR)))+')';
+          ctx.lineWidth=DPR*0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  resize();tick();
+  window.addEventListener('resize',resize);
+
+  /* ---------- header scroll ---------- */
+  var header=document.getElementById('header');
+  function onScroll(){ if(window.scrollY>30)header.classList.add('scrolled'); else header.classList.remove('scrolled'); }
+  window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+  /* ---------- mobile menu ---------- */
+  var burger=document.getElementById('burger');
+  var mobileMenu=document.getElementById('mobileMenu');
+  burger.addEventListener('click',function(){mobileMenu.classList.toggle('open');});
+  document.querySelectorAll('.mm').forEach(function(a){a.addEventListener('click',function(){mobileMenu.classList.remove('open');});});
+
+  /* ---------- reveal ---------- */
+  var revEls=document.querySelectorAll('.reveal');
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}
+    });
+  },{threshold:0.12,rootMargin:'0px 0px -8% 0px'});
+  revEls.forEach(function(el){io.observe(el);});
+
+  /* ---------- counters ---------- */
+  var counters=document.querySelectorAll('.count');
+  var cio=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        var el=e.target,to=parseInt(el.getAttribute('data-to'),10);
+        var dur=1400,start=null;
+        function step(ts){
+          if(!start)start=ts;
+          var p=Math.min((ts-start)/dur,1);
+          var ease=1-Math.pow(1-p,3);
+          el.textContent=Math.floor(ease*to).toLocaleString('ru-RU');
+          if(p<1)requestAnimationFrame(step);else el.textContent=to.toLocaleString('ru-RU');
+        }
+        requestAnimationFrame(step);
+        cio.unobserve(el);
+      }
+    });
+  },{threshold:0.5});
+  counters.forEach(function(el){cio.observe(el);});
+
+  /* ---------- FAQ ---------- */
+  document.querySelectorAll('.faq-item').forEach(function(item){
+    var q=item.querySelector('.faq-q');
+    var a=item.querySelector('.faq-a');
+    q.addEventListener('click',function(){
+      var open=item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(function(it){
+        it.classList.remove('open');
+        it.querySelector('.faq-a').style.maxHeight=null;
+      });
+      if(!open){item.classList.add('open');a.style.maxHeight=a.scrollHeight+'px';}
+    });
+  });
+
+  /* ---------- reviews slider ---------- */
+  var reviews=[
+    {name:'Дмитрий К.',meta:'Ученик · 3 месяца',av:'#5b8def',in:'ДК',dur:'2:14',video:'https://example.com/video1',
+     text:'Запустил первую связку уже через неделю после старта. К концу первого месяца вышел на стабильный плюс. Всё разложено настолько понятно, что даже без опыта разобрался.'},
+    {name:'Алина М.',meta:'Ученица · 5 месяцев',av:'#e056a0',in:'АМ',dur:'1:58',video:'https://example.com/video2',
+     text:'Раньше думала, что финансы — это сложно. CASH FOUND перевернул моё представление. Самое ценное — это рабочие связки и поддержка, всегда подсказывают в нужный момент.'},
+    {name:'Сергей П.',meta:'Арбитражник · 1 год',av:'#8a8af0',in:'СП',dur:'2:40',video:'https://example.com/video3',
+     text:'Перешёл из другой ниши и не пожалел. Выплаты по финке реально выше, а связки из курса экономят недели тестов. Масштабировался за два месяца.'},
+    {name:'Кирилл В.',meta:'Новичок · 2 месяца',av:'#f5a623',in:'КВ',dur:'1:32',video:'https://example.com/video4',
+     text:'Начал вообще с нуля. Первые деньги получил на третий день запуска. Пошаговость — огонь, ни одного лишнего действия, всё по делу.'},
+    {name:'Наталья С.',meta:'Ученица · 4 месяца',av:'#9b6dff',in:'НС',dur:'2:05',video:'https://example.com/video5',
+     text:'Работаю удалённо и параллельно с основной работой. Удалось выйти на дополнительный доход, который постепенно обгоняет зарплату. Спасибо Артёму за систему.'},
+    {name:'Артём Л.',meta:'Ученик · 6 месяцев',av:'#ff7a7a',in:'АЛ',dur:'2:22',video:'https://example.com/video6',
+     text:'Главное — это постоянные обновления. Связки не устаревают, всегда есть что тестировать. За полтора года в разных курсах — это лучший структурированный материал по финансам.'}
+  ];
+  var track=document.getElementById('track');
+  var dotsEl=document.getElementById('dots');
+  var starSVG='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.5 7 .9-5 4.8 1.3 7L12 18l-6.3 3.2L7 14.2 2 9.4l7-.9z"/></svg>';
+  var playSVG='<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+  reviews.forEach(function(r,i){
+    var slide=document.createElement('div');
+    slide.className='review';
+    slide.innerHTML=
+      '<div class="review-inner">'+
+        '<div class="review-media">'+
+          '<button class="play" data-i="'+i+'">'+playSVG+'</button>'+
+          '<div class="dur">▶ '+r.dur+'</div>'+
+        '</div>'+
+        '<div class="review-body">'+
+          '<div class="stars">'+starSVG+starSVG+starSVG+starSVG+starSVG+'</div>'+
+          '<p class="rtext">«'+r.text+'»</p>'+
+          '<div class="rwho">'+
+            '<div class="rav" style="background:'+r.av+'">'+r.in+'</div>'+
+            '<div><div class="rav-name">'+r.name+'</div><div class="rav-meta">'+r.meta+'</div></div>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+    track.appendChild(slide);
+    var dot=document.createElement('button');
+    if(i===0)dot.classList.add('active');
+    dot.setAttribute('data-i',i);
+    dotsEl.appendChild(dot);
+  });
+
+  var idx=0,total=reviews.length,autoTimer=null;
+  function go(n){
+    idx=(n+total)%total;
+    track.style.transform='translateX(-'+(idx*100)+'%)';
+    document.querySelectorAll('#dots button').forEach(function(d,i){d.classList.toggle('active',i===idx);});
+  }
+  document.getElementById('next').addEventListener('click',function(){go(idx+1);resetAuto();});
+  document.getElementById('prev').addEventListener('click',function(){go(idx-1);resetAuto();});
+  document.querySelectorAll('#dots button').forEach(function(d){
+    d.addEventListener('click',function(){go(parseInt(d.getAttribute('data-i'),10));resetAuto();});
+  });
+  function startAuto(){autoTimer=setInterval(function(){go(idx+1);},6000);}
+  function resetAuto(){clearInterval(autoTimer);startAuto();}
+  var revSec=document.getElementById('reviews');
+  var sio=new IntersectionObserver(function(e){if(e[0].isIntersecting)startAuto();else clearInterval(autoTimer);},{threshold:0.3});
+  sio.observe(revSec);
+
+  var sx=0,sxdiff=0;
+  track.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;sxdiff=0;},{passive:true});
+  track.addEventListener('touchmove',function(e){sxdiff=e.touches[0].clientX-sx;},{passive:true});
+  track.addEventListener('touchend',function(){if(Math.abs(sxdiff)>50){go(sxdiff<0?idx+1:idx-1);resetAuto();}});
+
+  /* ---------- video modal ---------- */
+  var modal=document.getElementById('modal');
+  var mtitle=document.getElementById('mtitle');
+  var mlink=document.getElementById('mlink');
+  document.body.addEventListener('click',function(e){
+    var btn=e.target.closest('.review-media .play');
+    if(btn){
+      var i=parseInt(btn.getAttribute('data-i'),10);
+      var r=reviews[i];
+      mtitle.textContent='Видео-отзыв · '+r.name;
+      mlink.textContent=r.video;
+      modal.classList.add('open');
+    }
+  });
+  function closeModal(){modal.classList.remove('open');}
+  document.getElementById('mclose').addEventListener('click',closeModal);
+  modal.addEventListener('click',function(e){if(e.target===modal)closeModal();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
+
+  /* ---------- smooth anchor scroll ---------- */
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click',function(e){
+      var id=a.getAttribute('href');
+      if(id.length>1){
+        var t=document.querySelector(id);
+        if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'});}
+      }
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
